@@ -1,8 +1,42 @@
 #!/usr/bin/env python
-from flask import Flask, json, abort, request
-import pybitcointools
+import os.path
+from flask import Flask, json, abort, request, Response, send_from_directory
+#import pybitcointools
+import bitcoin
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='static')
+app.config.from_object(__name__)
+
+def root_dir():  # pragma: no cover
+    return os.path.abspath(os.path.dirname(__file__))
+
+def get_file(filename):  # pragma: no cover
+    try:
+        src = os.path.join(root_dir(), filename)
+        # Figure out how flask returns static files
+        # Tried:
+        # - render_template
+        # - send_file
+        # This should not be so non-obvious
+        return open(src).read()
+    except IOError as exc:
+        return str(exc)
+
+#@app.route('/')
+#def default():
+#    return "hello,cj"
+
+@app.route('/', methods=['GET'])
+def index():
+    #content = get_file('assets/static/index.html')
+    #return Response(content, mimetype="text/html")
+    return app.send_static_file('index.html')
+
+@app.route('/js/<path:path>')
+def send_js(path):
+    print path
+    #return path
+    return send_from_directory('static/js', path)
 
 @app.route('/pushtx', methods=['POST'])
 def pushtx():
@@ -61,4 +95,4 @@ def gethistory(address):
     return json.dumps(result)
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', debug=True)
+    app.run(host='127.0.0.1', port=80, debug=True)
