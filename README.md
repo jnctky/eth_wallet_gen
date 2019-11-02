@@ -1,8 +1,10 @@
 # Ethereum Fundraising Python Server
 
-## Run
+apt install nginx
+pip install uwsgi
 
-```
-python assets/app.py
-```
+For centos install 
+yum install python-devel.x86_64
+
+
 
